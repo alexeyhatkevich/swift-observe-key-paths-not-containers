@@ -6,6 +6,23 @@ name `Profile`. Every write to `Profile` then redraws every element that reads
 anything in it — even when the key it reads did not change. The result is extra
 work, flicker and state resets on screens that have nothing to do with the write.
 
+## How to run
+
+**In Xcode (demo app + tests):**
+
+1. Open `Demo/Demo.xcodeproj` (it uses this package as a local dependency).
+2. Pick any iPhone simulator (iOS 17+) and press **⌘R**.
+3. Use the **Naive / Fixed** switch at the top. Each row is a UI element showing
+   what it reads and how many times it redrew; rows redrawn by the last write turn orange.
+   - Tap **Flip Face ID**: in *Naive* every row redraws, including the greeting, the
+     tag chips and the `ProfileDraft.title` header (substring match). In *Fixed* only
+     the Face ID toggle and the settings card redraw.
+   - Tap **Write the same Profile again**: *Naive* redraws everyone, *Fixed* nobody.
+4. **⌘U** runs the package test suite (the `Demo` scheme includes `KeyPathObservationTests`).
+
+**From the command line:** the library is plain Swift (Foundation only), so
+`swift test` works on macOS as well.
+
 This package reproduces the problem and the fix in pure Swift:
 
 - `NaiveStore` — container-wide notification, plus substring name matching
@@ -27,7 +44,7 @@ This package reproduces the problem and the fix in pure Swift:
 swift test
 ```
 
-Tests named `test_naive_…` assert the broken behaviour (they pass and document the
+or **⌘U** in `Demo/Demo.xcodeproj`. Tests named `test_naive_…` assert the broken behaviour (they pass and document the
 bug); `test_fixed_…` assert the fix; `test_diff_…`, `test_matcher_…` cover the
 edge cases: sibling change, nested change, container replaced, missing container,
 array change, look-alike container names and the `nil` legacy fallback.
